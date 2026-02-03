@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <title>University E-ticketing System</title>
+</head>
+<body>
+    <div class="toggle-container">
+        <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    
+    <div class="auth">
+        <div class="left">
+            <div>
+                <h2>
+                    Hello, Welcome
+                </h2>
+
+                <p>
+                    Don't have an Account?
+                </p>
+
+                <button type="button" class="btn" id="registerBtn">
+                    Register
+                </button>
+            </div>
+        </div>
+
+        <div class="right">
+            <h3>
+                Login
+            </h3>
+
+            <form id="loginForm">
+            <div class="input-group">
+                <input type="text" 
+                placeholder="Student ID"
+                id="studentId"
+                value="201109012"
+                required>
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="input-group">
+                <input type="password" 
+                placeholder="Password"
+                id="password"
+                value="demo1234"
+                required>
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <p class="forgot">
+                <a href="#">Forgot Password?</a>
+            </p>
+
+            <button type="submit" class="btn">
+                Login
+            </button>
+            </form>
+            <p style="font-size: 0.85rem; color: #777; margin-top: 20px">
+                Demo: ID = 201109012 | Password = demo1234
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const studentId = document.getElementById('studentId').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Dummy Validation
+            if (studentId === '201109012' && password === 'demo1234') {
+                alert('Login Successful!');
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Invalid Credentials. Use Demo: 201109012/ demo1234');
+            }
+        });
+
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            alert('Registration feature not functional, Use Demo for now');
+            //later : window.location.href='register.html';
+        });
+    </script>
+</body>
+</html>
