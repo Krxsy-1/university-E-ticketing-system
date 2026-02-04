@@ -3,13 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>UniTickets Dashboard</title>
     <link rel="stylesheet" href="dashboardStyles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <h2 class="logo">
+                    UniTickets
+                </h2>
+
+                <i class="fas fa-times close-btn" id="closeBtn"></i>
+            </div>
+        </div>
+
+        <nav>
+            <a href="#">Dashboard</a>
+            <a href="#">Events</a>
+            <a href="#">My Tickets</a>
+            <a href="#">Support</a>
+        </nav>
+
+        <div class="toggle">
+            <span>
+                Dark Mode
+            </span>
+
+            <input type="checkbox" id="darkToggle">
+        </div>
+    </aside>
+
+
     <div class="top-bar">
         <div class="greeting">
             Hello, Kristen
@@ -20,6 +48,8 @@
         </div>
     </div>
 
+    <main class="content">
+        <header>
     <div class="hero">
         <h1>
             University of XYZ
@@ -27,8 +57,9 @@
         <p>
             Discover and Book Campus Events in Seconds
         </p>
-        <input type="text" placeholder="Search Events, Clubs..."/>
+        <input type="text" placeholder="Search Events, Clubs..." aria-label="Search events"/>
     </div>
+    </header>
 
     <div class="stats">
         <div class="stat-card">
@@ -62,121 +93,130 @@
         </div>
     </div>
 
-
-    <div class="events-title">
-        Upcoming Events
-    </div>
-
-    <div class="event-grid">
+    <section class="events-grid">
         <div class="event-card">
-            <img src="images/image1.jpeg">
+            <img src="images/image1.jpeg" alt="event">
             <div class="event-info">
-                <div class="event-meta">
-                    Fri, 1 Aug • 3:00 PM • Main Auditorium
-                </div>
+                <h3>
+                    Event
+                </h3>
 
-                <div class="event-price">
-                    N1,500
-                </div>
+                <p>
+                    12 march 2026
+                </p>
 
-                <button class="btn-buy">
+                <p>
+                    6:00 PM
+                </p>
+
+                <p class="price">
+                    N3000
+                </p>
+
+                <button>
                     Buy Ticket
                 </button>
             </div>
         </div>
 
         <div class="event-card">
-            <img src="images/image2.jpeg">
+            <img src="images/image2.jpeg" alt="event">
             <div class="event-info">
-                <div class="event-meta">
-                    Fri, 1 Aug • 3:00 PM • Main Auditorium
-                </div>
+                <h3>
+                    Event
+                </h3>
 
-                <div class="event-price">
-                    N1,500
-                </div>
+                <p>
+                    12 march 2026
+                </p>
 
-                <button class="btn-buy">
+                <p>
+                    6:00 PM
+                </p>
+
+                <p class="price">
+                    N3000
+                </p>
+
+                <button>
                     Buy Ticket
                 </button>
             </div>
         </div>
 
         <div class="event-card">
-            <img src="images/image3.jpeg">
+            <img src="images/image3.jpeg" alt="event">
             <div class="event-info">
-                <div class="event-meta">
-                    Fri, 1 Aug • 3:00 PM • Main Auditorium
-                </div>
+                <h3>
+                    Event
+                </h3>
 
-                <div class="event-price">
-                    N1,500
-                </div>
+                <p>
+                    12 march 2026
+                </p>
 
-                <button class="btn-buy">
+                <p>
+                    6:00 PM
+                </p>
+
+                <p class="price">
+                    N3000
+                </p>
+
+                <button>
                     Buy Ticket
                 </button>
             </div>
         </div>
 
         <div class="event-card">
-            <img src="images/image4.jpeg">
+            <img src="images/image4.jpeg" alt="event">
             <div class="event-info">
-                <div class="event-meta">
-                    Fri, 1 Aug • 3:00 PM • Main Auditorium
-                </div>
+                <h3>
+                    Event
+                </h3>
 
-                <div class="event-price">
-                    N1,500
-                </div>
+                <p>
+                    12 march 2026
+                </p>
 
-                <button class="btn-buy">
+                <p>
+                    6:00 PM
+                </p>
+
+                <p class="price">
+                    N3000
+                </p>
+
+                <button>
                     Buy Ticket
                 </button>
             </div>
         </div>
-    </div>
 
-    <div class="bottom-nav">
-        <div class="nav-item active">
-            <div class="nav-icon">
-                <i class="fa-solid fa-house">
-                </i>
-            </div>
-            Home
-        </div>
-
-        <div class="nav-item">
-            <div class="nav-icon">
-                <i class="fa-solid fa-calender-days">
-                </i>
-            </div>
-            Events
-        </div>
-
-        <div class="nav-item">
-            <div class="nav-icon">
-                <i class="fa-solid fa-ticket">
-                </i>
-            </div>
-            My Tickets
-        </div>
-
-        <div class="nav-item">
-            <div class="nav-icon">
-                <i class="fa-solid fa-user">
-                </i>
-            </div>
-            Profile
-        </div>
-
-        <div class="nav-item">
-            <div class="nav-icon">
-                <i class="fa-solid fa-gear">
-                </i>
-            </div>
-            Settings
-        </div>
-    </div>
+    </section>
+    </main>
 </body>
+
+<script>
+    const toggle=document.getElementById("darkToggle");
+
+    toggle.addEventListener("change", () => {
+        document.body.classList.toggle("dark");
+    });
+
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.getElementById("menuBtn");
+    const closeBtn = document.getElementById("closeBtn");
+
+    menuBtn.addEventListener("click", () => {
+        sidebar.classList.add("active");
+    });
+
+    closeBtn.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+    });
+
+
+</script>
 </html>
