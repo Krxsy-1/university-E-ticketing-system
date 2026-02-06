@@ -11,105 +11,142 @@
 </head>
 <body>
     <div class="toggle">
-            <span>
+        <span class="toggle-label">
+            <i class="fa-regular fa-moon"></i>
                 Dark Mode
-            </span>
+        </span>
 
-            <input type="checkbox" id="darkToggle">
-        </div>
-
-        <div class="nav-logo">U</div>
-        
-    <div class="auth">
-        <div class="left">
-            <div>
-                <h2>
-                    Hello, Welcome
-                </h2>
-
-                <br>
-
-                <p>
-                    Don't have an Account?
-                </p>
-
-                <br>
-
-                <button type="button" class="btn" id="registerBtn">
-                    Register
-                </button>
-            </div>
-        </div>
-
-        <div class="right">
-            <h3>
-                Login
-            </h3>
-
-            <form id="loginForm">
-            <div class="input-group">
-                <input type="text" 
-                placeholder="Student ID"
-                id="studentId"
-                value="201109012"
-                required>
-                <i class="fa-solid fa-user"></i>
-            </div>
-
-            <div class="input-group">
-                <input type="password" 
-                placeholder="Password"
-                id="password"
-                value="demo1234"
-                required>
-                <i class="fa-solid fa-lock"></i>
-            </div>
-
-            <br>
-
-            <p class="forgot">
-                <a href="#">Forgot Password?</a>
-            </p>
-
-            <br>
-
-            <button type="submit" class="btn" id="loginBtn">
-                Login
-            </button>
-
-            </form>
-
-            <p style="font-size: 0.85rem; color: #777; margin-top: 20px">
-                Demo: ID = 201109012 | Password = demo1234
-            </p>
-        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="darkToggle" />
+                <span class="toggle-slider"></span>
+        </label>
     </div>
 
+  <!-- LOGO -->
+    <div class="nav-logo">
+        U
+    </div>
+
+  <!-- AUTH WRAPPER -->
+    <main class="auth">
+        <section class="left">
+            <div>
+                <h1>
+                    Hello, Welcome
+                </h1>
+
+                <p>
+                    Don’t have an account yet?
+                </p>
+
+                <button type="button" class="btn btn-light" id="registerBtn">
+                    <i class="fa-solid fa-user-plus"></i>
+                        Register
+                </button>
+            </div>
+        </section>
+
+        <section class="right">
+            <header class="right-header">
+                <h2>
+                    Login
+                </h2>
+                    
+                <p class="right-subtitle">
+                    Use your student credentials to access your dashboard.
+                </p>
+            </header>
+
+            <form id="loginForm" novalidate>
+                <div class="input-group">
+                    <label for="studentId">
+                        Student ID
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" id="studentId" placeholder="Enter your student ID" value="201109012" required />
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">
+                        Password
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="Enter your password" value="demo1234" required />
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+
+                <p class="forgot">
+                    <a href="#">
+                        Forgot password?
+                    </a>
+                </p>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    Login
+                </button>
+
+                <p class="demo-note">
+                    Demo credentials: 
+                    <strong>
+                        ID:
+                    </strong> 
+                    201109012 &nbsp;|&nbsp; 
+                    <strong>
+                        Password:
+                    </strong> 
+                    demo1234
+                </p>
+            </form>
+        </section>
+    </main>
+
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        const loginForm = document.getElementById("loginForm");
+        const studentIdInput = document.getElementById("studentId");
+        const passwordInput = document.getElementById("password");
 
-            const studentId = document.getElementById('studentId').value.trim();
-            const password = document.getElementById('password').value.trim();
+        loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-            // Dummy Validation
-            if (studentId === '201109012' && password === 'demo1234') {
-                alert('Login Successful!');
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Invalid Credentials. Use Demo: 201109012/ demo1234');
+        const studentId = studentIdInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (studentId === "201109012" && password === "demo1234") {
+            alert("Login successful!");
+            window.location.href = "dashboard.html";
+        } 
+        else 
+        {
+        alert("Invalid credentials. Use demo: 201109012 / demo1234");
+      }
+      });
+
+        const toggle = document.getElementById("darkToggle");
+        const body = document.body;
+
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                body.classList.add("dark");
+                toggle.checked = true;
+            } 
+            else 
+            {
+                body.classList.remove("dark");
+                toggle.checked = false;
             }
-        });
+        }
 
-        document.getElementById('registerBtn').addEventListener('click', function() {
-            alert('Registration feature not functional, Use Demo for now');
-            //later : window.location.href='register.html';
-        });
-
-        const toggle=document.getElementById("darkToggle");
+        const savedTheme = localStorage.getItem("unitickets-theme");
+        applyTheme(savedTheme || "light");
 
         toggle.addEventListener("change", () => {
-            document.body.classList.toggle("dark");
+        const newTheme = toggle.checked ? "dark" : "light";
+        applyTheme(newTheme);
+        localStorage.setItem("unitickets-theme", newTheme);
         });
     </script>
 </body>
