@@ -1,11 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buy Ticket</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Buy Ticket — UniTickets</title>
+    <link rel="stylesheet" href="dashboardStyles.css">
+    <link rel="stylesheet" href="dashboardStyles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        /* small page-specific overrides */
+        :root{--page-padding:24px}
+        body{padding:var(--page-padding)}
+        .buy-container{max-width:980px;margin:40px auto}
+        .buy-card{background:var(--card);padding:22px;border-radius:12px}
+        .buy-row{display:flex;gap:20px;align-items:center}
+        .buy-event-info{flex:1}
+        .buy-title{font-size:1.6rem;margin-bottom:6px;color:var(--text)}
+        .buy-price{font-weight:700;color:var(--blue);font-size:1.3rem}
+        .checkout-form{margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+        .checkout-form input[type="number"], .checkout-form input[type="text"]
+        {padding:10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--input-text)}
+        .checkout-actions{margin-top:18px;display:flex;gap:12px}
+        a.back-link{display:inline-block;margin-bottom:12px;color:var(--text);text-decoration:none}
+        a.back-link:hover{text-decoration:underline}
+    </style>
 </head>
 <body>
-    
+    <div class="buy-container">
+        <a class="back-link" href="dashboard.html">← Back to dashboard</a>
+
+        <div class="buy-card">
+            <div class="buy-row">
+                <div class="buy-event-info">
+                    <div class="buy-title" id="eventTitle">Event</div>
+                    <div class="buy-meta" id="eventMeta">Details</div>
+                </div>
+                <div>
+                    <div class="buy-price" id="eventPrice">₦0</div>
+                </div>
+            </div>
+
+            <form id="checkoutForm" class="checkout-form">
+                <label style="display:flex;flex-direction:column">
+                    Quantity
+                    <input type="number" id="qty" name="qty" min="1" max="1" value="1" />
+                </label>
+
+                <label style="display:flex;flex-direction:column;min-width:220px">
+                    Full name
+                    <input type="text" id="buyerName" name="name" placeholder="Your full name" required />
+                </label>
+
+                <label style="display:flex;flex-direction:column;min-width:220px">
+                    Matric Number
+                    <input type="text" id="buyerMatricNumber" name="matricNumber" placeholder="Your matric number" required />
+                </label>
+
+                <label style="display:flex;flex-direction:column;min-width:220px">
+                    Department
+                    <input type="text" id="buyerDepartment" name="department" placeholder="Your department" required />
+                </label>
+
+                <label style="display:flex;flex-direction:column;min-width:220px">
+                    Email
+                    <input type="text" id="buyerEmail" name="email" placeholder="you@elizadeuniversity.edu.ng" />
+                </label>
+            </form>
+
+            <div class="checkout-actions">
+                <button id="proceedBtn" class="btn btn-primary">Proceed to payment</button>
+                <button id="cancelBtn" class="btn btn-ghost">Cancel</button>
+            </div>
+
+            <p style="margin-top:16px;color:var(--text);opacity:0.85">This is a demo flow — no payments are processed. Proceeding will show a success message and take you back to the dashboard.</p>
+        </div>
+    </div>
+
+    <script>
+        // Helper to read query params
+        function qs(key){
+            const params = new URLSearchParams(window.location.search);
+            return params.get(key) || '';
+        }
+
+        const titleParam = qs('event');
+        const priceParam = qs('price');
+        const eventTitleEl = document.getElementById('eventTitle');
+        const eventPriceEl = document.getElementById('eventPrice');
+        const eventMetaEl = document.getElementById('eventMeta');
+
+        const title = titleParam ? decodeURIComponent(titleParam) : 'Event';
+        const price = priceParam ? decodeURIComponent(priceParam) : '';
+
+        eventTitleEl.innerText = title;
+        eventPriceEl.innerText = price || 'Free';
+        eventMetaEl.innerText = price ? ('Price: ' + price) : 'Free entry';
+
+        const qty = document.getElementById('qty');
+        const proceedBtn = document.getElementById('proceedBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        function parseNumberFromCurrency(str){
+            if(!str) return 0;
+            const n = str.replace(/[^0-9\.]/g, '');
+            return parseFloat(n) || 0;
+        }
+
+        proceedBtn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            const buyer = document.getElementById('buyerName').value.trim();
+            if(!buyer){
+                alert('Please enter your full name');
+                return;
+            }
+            const unit = parseNumberFromCurrency(price);
+            const q = Number(qty.value) || 1;
+            const total = unit * q;
+            alert(`Success!\n\n${q} x ${title} purchased for ₦${total.toLocaleString()}.\n\nName: ${buyer}`);
+            window.location.href = 'dashboard.html';
+        });
+
+        cancelBtn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            window.location.href = 'dashboard.html';
+        });
+    </script>
 </body>
 </html>

@@ -56,21 +56,6 @@
                     sidebar.classList.remove("active");
                   });
                 }
-
-                // Make Buy Ticket buttons clickable
-                const buyButtons = document.querySelectorAll('.event-info button');
-                buyButtons.forEach(btn => {
-                  btn.addEventListener('click', (e) => {
-                    const card = e.target.closest('.event-card');
-                    const title = card?.querySelector('.event-info h3')?.innerText.trim() || 'Event';
-                    const price = card?.querySelector('.price')?.innerText.trim() || '';
-                    const confirmed = confirm(`Buy ticket for ${title} ${price ? '('+price+')' : '' }?`);
-                    if (confirmed) {
-                      // placeholder: redirect to a checkout page (to be implemented)
-                      window.location.href = `checkout.html?event=${encodeURIComponent(title)}`;
-                    }
-                  });
-                });
               })();
             </script>
                 Student
