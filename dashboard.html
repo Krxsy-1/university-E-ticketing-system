@@ -456,36 +456,59 @@
   </div>
 
   <script>
+    // Dark mode toggle - synced across pages
+    const toggle = document.getElementById("darkToggle");
+    const body = document.body;
+
+    function applyTheme(theme) {
+      if (theme === "dark") {
+        body.classList.add("dark");
+        if (toggle) toggle.checked = true;
+      } else {
+        body.classList.remove("dark");
+        if (toggle) toggle.checked = false;
+      }
+    }
+
+    const savedTheme = localStorage.getItem("unitickets-theme");
+    applyTheme(savedTheme || "light");
+
+    if (toggle) {
+      toggle.addEventListener("change", () => {
+        const newTheme = toggle.checked ? "dark" : "light";
+        applyTheme(newTheme);
+        localStorage.setItem("unitickets-theme", newTheme);
+      });
+    }
+
     // Theme toggle
     const themeToggle = document.getElementById("themeToggle");
     const themeToggleSecondary = document.getElementById("themeToggleSecondary");
-    const body = document.body;
 
     function syncThemeIcon() {
-      const icon = themeToggle.querySelector("i");
-      if (body.classList.contains("dark")) {
-        icon.classList.remove("fa-moon");
-        icon.classList.add("fa-sun");
-      } else {
-        icon.classList.remove("fa-sun");
-        icon.classList.add("fa-moon");
+      const icon = themeToggle?.querySelector("i");
+      if (icon) {
+        if (body.classList.contains("dark")) {
+          icon.classList.remove("fa-moon");
+          icon.classList.add("fa-sun");
+        } else {
+          icon.classList.remove("fa-sun");
+          icon.classList.add("fa-moon");
+        }
       }
     }
 
     function toggleTheme() {
       body.classList.toggle("dark");
-      localStorage.setItem("unitickets-theme", body.classList.contains("dark") ? "dark" : "light");
+      const newTheme = body.classList.contains("dark") ? "dark" : "light";
+      localStorage.setItem("unitickets-theme", newTheme);
       syncThemeIcon();
+      if (toggle) toggle.checked = body.classList.contains("dark");
     }
 
-    themeToggle.addEventListener("click", toggleTheme);
-    themeToggleSecondary.addEventListener("click", toggleTheme);
+    if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
+    if (themeToggleSecondary) themeToggleSecondary.addEventListener("click", toggleTheme);
 
-    // Load saved theme
-    const savedTheme = localStorage.getItem("unitickets-theme");
-    if (savedTheme === "dark") {
-      body.classList.add("dark");
-    }
     syncThemeIcon();
 
     // Search clear

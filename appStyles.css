@@ -1,0 +1,62 @@
+/* Shared app styles extracted from dashboardStyles.css (variables + core components)
+   Purpose: small reusable stylesheet for pages like buyTicket.html */
+
+:root{
+  --bg: #f5f6fb;
+  --bg-elevated: #ffffff;
+  --bg-soft: #f0f2f8;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --accent: #4f46e5;
+  --accent-soft: rgba(79,70,229,0.12);
+  --border-subtle: #e5e7eb;
+  --shadow-soft: 0 18px 45px rgba(15,23,42,0.08);
+  --radius-lg: 18px;
+  --transition-fast: 0.2s ease;
+  --transition-med: 0.3s ease;
+}
+
+body.dark{
+  --bg: #050816;
+  --bg-elevated: #0b1020;
+  --bg-soft: #050816;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --accent: #6366f1;
+  --accent-soft: rgba(99,102,241,0.18);
+  --border-subtle: #1f2933;
+  --shadow-soft: 0 22px 55px rgba(0,0,0,0.7);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{font-family:Inter, system-ui, -apple-system, "Segoe UI", sans-serif;background:var(--bg);color:var(--text-main);min-height:100vh;padding:20px;transition:background var(--transition-med),color var(--transition-med)}
+
+/* Cards */
+.card{background:var(--bg-elevated);border-radius:var(--radius-lg);padding:16px;border:1px solid var(--border-subtle);box-shadow:var(--shadow-soft)}
+
+/* Buttons */
+.btn{border-radius:999px;border:none;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform var(--transition-fast),box-shadow var(--transition-fast)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 10px 25px rgba(79,70,229,0.45)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle)}
+.btn-ghost:hover{color:var(--accent);border-color:var(--accent)}
+
+/* Form inputs */
+.input{padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-soft);color:var(--text-main)}
+
+/* Utilities */
+.container{max-width:980px;margin:0 auto;padding:0 12px}
+.flex{display:flex}
+.center{display:flex;align-items:center}
+.column{display:flex;flex-direction:column}
+
+/* Small helpers */
+.muted{color:var(--text-muted)}
+.small{font-size:13px}
+
+/* Make sure existing dashboard classes still work */
+.event-price-main{color:var(--accent)}
+
+/* Ensure buy page overrides match */
+.buy-card{background:var(--bg-elevated);padding:22px;border-radius:12px}

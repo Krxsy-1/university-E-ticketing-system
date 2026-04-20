@@ -4,125 +4,545 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Buy Ticket — UniTickets</title>
-    <link rel="stylesheet" href="dashboardStyles.css">
-    <link rel="stylesheet" href="dashboardStyles.css">
+    <link rel="stylesheet" href="appStyles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* small page-specific overrides */
-        :root{--page-padding:24px}
-        body{padding:var(--page-padding)}
-        .buy-container{max-width:980px;margin:40px auto}
-        .buy-card{background:var(--card);padding:22px;border-radius:12px}
-        .buy-row{display:flex;gap:20px;align-items:center}
-        .buy-event-info{flex:1}
-        .buy-title{font-size:1.6rem;margin-bottom:6px;color:var(--text)}
-        .buy-price{font-weight:700;color:var(--blue);font-size:1.3rem}
-        .checkout-form{margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-        .checkout-form input[type="number"], .checkout-form input[type="text"]
-        {padding:10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--input-text)}
-        .checkout-actions{margin-top:18px;display:flex;gap:12px}
-        a.back-link{display:inline-block;margin-bottom:12px;color:var(--text);text-decoration:none}
-        a.back-link:hover{text-decoration:underline}
+        body {
+            background: radial-gradient(circle at top left, #e0e7ff 0, var(--bg) 40%, var(--bg) 100%);
+            padding: 30px 16px;
+        }
+
+        body.dark {
+            background: radial-gradient(circle at top left, #111827 0, #020617 40%, #020617 100%);
+        }
+
+        .buy-page {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .buy-header {
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .buy-back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+            font-size: 18px;
+        }
+
+        .buy-back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+        }
+
+        .buy-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .buy-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .buy-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .buy-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .event-summary {
+            background: var(--bg-elevated);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .event-summary h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .event-summary-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .event-summary-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .event-summary-meta i {
+            color: var(--accent);
+            font-size: 13px;
+        }
+
+        .form-card {
+            background: var(--bg-elevated);
+            border-radius: 18px;
+            padding: 24px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .form-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-size: 14px;
+            font-family: inherit;
+            transition: border var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background var(--transition-fast);
+        }
+
+        .qty-btn:hover {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .qty-input {
+            width: 50px;
+            text-align: center;
+        }
+
+        .order-summary {
+            background: var(--bg-elevated);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-soft);
+            position: sticky;
+            top: 20px;
+        }
+
+        .order-summary h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: var(--text-main);
+            text-transform: uppercase;
+        }
+
+        .order-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .order-line.total {
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .order-total-amount {
+            color: var(--accent);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.45);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 35px rgba(79, 70, 229, 0.6);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+        }
+
+        .btn-ghost:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .disclaimer {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .buy-header h1 {
+                font-size: 22px;
+            }
+
+            .form-card,
+            .event-summary {
+                padding: 16px;
+            }
+
+            .order-summary {
+                position: static;
+            }
+
+            .action-buttons {
+                flex-direction: column-reverse;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="buy-container">
-        <a class="back-link" href="dashboard.html">← Back to dashboard</a>
+    <div class="buy-page">
+        <div class="buy-header">
+            <button class="buy-back-btn" onclick="window.location.href='dashboard.html';" title="Back to dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h1>Checkout</h1>
+        </div>
 
-        <div class="buy-card">
-            <div class="buy-row">
-                <div class="buy-event-info">
-                    <div class="buy-title" id="eventTitle">Event</div>
-                    <div class="buy-meta" id="eventMeta">Details</div>
+        <div class="buy-layout">
+            <!-- Main checkout form -->
+            <div class="buy-main">
+                <!-- Event Summary -->
+                <div class="event-summary">
+                    <h3 id="eventTitle">Event Title</h3>
+                    <div class="event-summary-meta">
+                        <span><i class="fa-regular fa-calendar"></i> <span id="eventDate">Date</span></span>
+                        <span><i class="fa-regular fa-clock"></i> <span id="eventTime">Time</span></span>
+                        <span><i class="fa-solid fa-location-dot"></i> <span id="eventLocation">Venue</span></span>
+                    </div>
                 </div>
-                <div>
-                    <div class="buy-price" id="eventPrice">₦0</div>
+
+                <!-- Attendee Information Form -->
+                <div class="form-card">
+                    <h3><i class="fa-solid fa-user"></i> Attendee Information</h3>
+                    <form id="checkoutForm">
+                        <div class="form-group">
+                            <label for="buyerName">Full Name</label>
+                            <input type="text" id="buyerName" name="name" placeholder="Enter your full name" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="buyerMatricNumber">Matric Number</label>
+                            <input type="text" id="buyerMatricNumber" name="matricNumber" placeholder="e.g., 201109012" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="buyerDepartment">Department</label>
+                            <input type="text" id="buyerDepartment" name="department" placeholder="Your department" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="buyerEmail">Email Address</label>
+                            <input type="email" id="buyerEmail" name="email" placeholder="you@elizadeuniversity.edu.ng" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Quantity</label>
+                            <div class="qty-selector">
+                                <button type="button" class="qty-btn" onclick="decrementQty();">−</button>
+                                <input type="number" id="qty" class="qty-input" min="1" value="1" readonly />
+                                <button type="button" class="qty-btn" onclick="incrementQty();">+</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="proceedBtn" class="btn btn-primary">
+                        <i class="fa-solid fa-lock"></i>
+                        Proceed to Payment
+                    </button>
+                    <button id="cancelBtn" class="btn btn-ghost">
+                        <i class="fa-solid fa-times"></i>
+                        Cancel
+                    </button>
                 </div>
             </div>
 
-            <form id="checkoutForm" class="checkout-form">
-                <label style="display:flex;flex-direction:column">
-                    Quantity
-                    <input type="number" id="qty" name="qty" min="1" max="1" value="1" />
-                </label>
+            <!-- Order Summary Sidebar -->
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                <div class="order-line">
+                    <span id="summaryEventName">Event</span>
+                    <span id="summaryPrice">₦0</span>
+                </div>
+                <div class="order-line">
+                    <span>Quantity: <span id="summaryQty">1</span></span>
+                </div>
+                <div class="order-line">
+                    <span>Subtotal</span>
+                    <span id="subtotal">₦0</span>
+                </div>
+                <div class="order-line">
+                    <span>Service Fee (0%)</span>
+                    <span>₦0</span>
+                </div>
+                <div class="order-line total">
+                    <span>Total Amount</span>
+                    <span class="order-total-amount" id="totalAmount">₦0</span>
+                </div>
 
-                <label style="display:flex;flex-direction:column;min-width:220px">
-                    Full name
-                    <input type="text" id="buyerName" name="name" placeholder="Your full name" required />
-                </label>
+                <div class="action-buttons" style="margin-top: 14px;">
+                    <button id="proceedBtnSidebar" class="btn btn-primary" style="width: 100%;">
+                        <i class="fa-solid fa-credit-card"></i>
+                        Pay Now
+                    </button>
+                </div>
 
-                <label style="display:flex;flex-direction:column;min-width:220px">
-                    Matric Number
-                    <input type="text" id="buyerMatricNumber" name="matricNumber" placeholder="Your matric number" required />
-                </label>
-
-                <label style="display:flex;flex-direction:column;min-width:220px">
-                    Department
-                    <input type="text" id="buyerDepartment" name="department" placeholder="Your department" required />
-                </label>
-
-                <label style="display:flex;flex-direction:column;min-width:220px">
-                    Email
-                    <input type="text" id="buyerEmail" name="email" placeholder="you@elizadeuniversity.edu.ng" />
-                </label>
-            </form>
-
-            <div class="checkout-actions">
-                <button id="proceedBtn" class="btn btn-primary">Proceed to payment</button>
-                <button id="cancelBtn" class="btn btn-ghost">Cancel</button>
+                <p class="disclaimer">
+                    ✓ Secure payment<br>
+                    ✓ Instant ticket delivery<br>
+                    ✓ Money-back guarantee
+                </p>
             </div>
-
-            <p style="margin-top:16px;color:var(--text);opacity:0.85">This is a demo flow — no payments are processed. Proceeding will show a success message and take you back to the dashboard.</p>
         </div>
     </div>
 
     <script>
+        // Dark mode toggle - synced across pages
+        const toggle = document.getElementById("darkToggle");
+        const body = document.body;
+
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                body.classList.add("dark");
+                if (toggle) toggle.checked = true;
+            } else {
+                body.classList.remove("dark");
+                if (toggle) toggle.checked = false;
+            }
+        }
+
+        const savedTheme = localStorage.getItem("unitickets-theme");
+        applyTheme(savedTheme || "light");
+
+        if (toggle) {
+            toggle.addEventListener("change", () => {
+                const newTheme = toggle.checked ? "dark" : "light";
+                applyTheme(newTheme);
+                localStorage.setItem("unitickets-theme", newTheme);
+            });
+        }
+
         // Helper to read query params
-        function qs(key){
+        function qs(key) {
             const params = new URLSearchParams(window.location.search);
             return params.get(key) || '';
         }
 
+        // Parse event data from URL
         const titleParam = qs('event');
         const priceParam = qs('price');
-        const eventTitleEl = document.getElementById('eventTitle');
-        const eventPriceEl = document.getElementById('eventPrice');
-        const eventMetaEl = document.getElementById('eventMeta');
 
         const title = titleParam ? decodeURIComponent(titleParam) : 'Event';
         const price = priceParam ? decodeURIComponent(priceParam) : '';
 
-        eventTitleEl.innerText = title;
-        eventPriceEl.innerText = price || 'Free';
-        eventMetaEl.innerText = price ? ('Price: ' + price) : 'Free entry';
+        // Populate event details
+        document.getElementById('eventTitle').innerText = title;
+        document.getElementById('summaryEventName').innerText = title;
+        document.getElementById('summaryPrice').innerText = price || 'Free';
+        
+        // Set placeholder dates/times (would come from backend in real app)
+        document.getElementById('eventDate').innerText = '15 Mar 2026';
+        document.getElementById('eventTime').innerText = '6:00 PM';
+        document.getElementById('eventLocation').innerText = 'Main Auditorium';
 
-        const qty = document.getElementById('qty');
-        const proceedBtn = document.getElementById('proceedBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
+        // Quantity management
+        let quantity = 1;
 
-        function parseNumberFromCurrency(str){
-            if(!str) return 0;
+        function incrementQty() {
+            quantity++;
+            document.getElementById('qty').value = quantity;
+            updateSummary();
+        }
+
+        function decrementQty() {
+            if (quantity > 1) {
+                quantity--;
+                document.getElementById('qty').value = quantity;
+                updateSummary();
+            }
+        }
+
+        function parseNumberFromCurrency(str) {
+            if (!str) return 0;
             const n = str.replace(/[^0-9\.]/g, '');
             return parseFloat(n) || 0;
         }
 
-        proceedBtn.addEventListener('click', (e)=>{
-            e.preventDefault();
+        function updateSummary() {
+            document.getElementById('summaryQty').innerText = quantity;
+            const unit = parseNumberFromCurrency(price);
+            const subtotal = unit * quantity;
+            const fee = 0;
+            const total = subtotal + fee;
+
+            document.getElementById('subtotal').innerText = `₦${subtotal.toLocaleString()}`;
+            document.getElementById('totalAmount').innerText = `₦${total.toLocaleString()}`;
+        }
+
+        // Initial summary update
+        updateSummary();
+
+        // Button handlers
+        const proceedBtn = document.getElementById('proceedBtn');
+        const proceedBtnSidebar = document.getElementById('proceedBtnSidebar');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        function handleProceed() {
             const buyer = document.getElementById('buyerName').value.trim();
-            if(!buyer){
+            const matric = document.getElementById('buyerMatricNumber').value.trim();
+            const dept = document.getElementById('buyerDepartment').value.trim();
+            const email = document.getElementById('buyerEmail').value.trim();
+
+            if (!buyer) {
                 alert('Please enter your full name');
                 return;
             }
+            if (!matric) {
+                alert('Please enter your matric number');
+                return;
+            }
+            if (!dept) {
+                alert('Please enter your department');
+                return;
+            }
+            if (!email) {
+                alert('Please enter your email');
+                return;
+            }
+
             const unit = parseNumberFromCurrency(price);
-            const q = Number(qty.value) || 1;
-            const total = unit * q;
-            alert(`Success!\n\n${q} x ${title} purchased for ₦${total.toLocaleString()}.\n\nName: ${buyer}`);
+            const total = unit * quantity;
+
+            alert(`✓ Purchase Successful!\n\n${quantity}x ${title}\nTotal: ₦${total.toLocaleString()}\n\nName: ${buyer}\nMatric: ${matric}\n\nYour ticket has been sent to ${email}`);
             window.location.href = 'dashboard.html';
+        }
+
+        proceedBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleProceed();
         });
 
-        cancelBtn.addEventListener('click', (e)=>{
+        proceedBtnSidebar.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleProceed();
+        });
+
+        cancelBtn.addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'dashboard.html';
         });
