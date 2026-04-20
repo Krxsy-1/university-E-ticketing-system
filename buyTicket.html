@@ -304,6 +304,16 @@
     </style>
 </head>
 <body>
+    <!-- Loading Spinner -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-container">
+            <div class="spinner"></div>
+            <div class="loader-text">
+                Loading<span class="loader-dots"><span>.</span><span>.</span><span>.</span></span>
+            </div>
+        </div>
+    </div>
+
     <div class="buy-page">
         <div class="buy-header">
             <button class="buy-back-btn" onclick="window.location.href='dashboard.html';" title="Back to dashboard">
@@ -412,6 +422,14 @@
     </div>
 
     <script>
+        // Hide loader when page fully loads
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loaderOverlay');
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+        });
+
         // Dark mode toggle - synced across pages
         const toggle = document.getElementById("darkToggle");
         const body = document.body;

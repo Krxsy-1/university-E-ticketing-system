@@ -10,6 +10,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+  <!-- Loading Spinner -->
+  <div class="loader-overlay" id="loaderOverlay">
+      <div class="loader-container">
+          <div class="spinner"></div>
+          <div class="loader-text">
+              Loading<span class="loader-dots"><span>.</span><span>.</span><span>.</span></span>
+          </div>
+      </div>
+  </div>
+
   <div class="app-shell">
     <header class="navbar">
       <div class="nav-left">
@@ -456,6 +466,14 @@
   </div>
 
   <script>
+    // Hide loader when page fully loads
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('loaderOverlay');
+        if (loader) {
+            loader.classList.add('hidden');
+        }
+    });
+
     // Dark mode toggle - synced across pages
     const toggle = document.getElementById("darkToggle");
     const body = document.body;
