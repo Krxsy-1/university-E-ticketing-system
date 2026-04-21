@@ -68,6 +68,7 @@ updateStatistics();
 
 // ===== EVENTS MANAGEMENT =====
 let currentEditingEventId = null;
+let eventImageData = null; // base64 data URL or existing image path
 
 function renderEvents() {
     const tbody = document.getElementById("eventsTableBody");
@@ -118,6 +119,12 @@ function openCreateModal() {
     currentEditingEventId = null;
     document.getElementById("modalTitle").innerText = "Create New Event";
     eventForm.reset();
+    // reset image preview
+    eventImageData = null;
+    const preview = document.getElementById('eventImagePreview');
+    const input = document.getElementById('eventImageInput');
+    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+    if (input) input.value = '';
     modal.classList.add("active");
 }
 
@@ -135,6 +142,10 @@ function openEditModal(id) {
     document.getElementById("eventPrice").value = event.price;
     document.getElementById("eventMaxTickets").value = event.maxTickets;
     document.getElementById("eventCategory").value = event.category;
+    // populate image preview
+    eventImageData = event.image || null;
+    const preview = document.getElementById('eventImagePreview');
+    if (preview && eventImageData) { preview.src = eventImageData; preview.style.display = 'block'; }
     modal.classList.add("active");
 }
 
@@ -151,6 +162,26 @@ modal.addEventListener("click", (e) => {
     if (e.target === modal) closeModal();
 });
 
+// Image input handler
+const imageInput = document.getElementById('eventImageInput');
+const imagePreview = document.getElementById('eventImagePreview');
+if (imageInput) {
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            eventImageData = null;
+            if (imagePreview) { imagePreview.src = ''; imagePreview.style.display = 'none'; }
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+            eventImageData = reader.result;
+            if (imagePreview) { imagePreview.src = eventImageData; imagePreview.style.display = 'block'; }
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
 // ===== EVENT FORM SUBMISSION =====
 eventForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -164,7 +195,7 @@ eventForm.addEventListener("submit", (e) => {
         price: parseInt(document.getElementById("eventPrice").value) || 0,
         maxTickets: parseInt(document.getElementById("eventMaxTickets").value),
         category: document.getElementById("eventCategory").value,
-        image: "/images/event-default.jpeg"
+        image: eventImageData || "/images/event-default.jpeg"
     };
 
     // Validation

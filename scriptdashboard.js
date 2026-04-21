@@ -40,7 +40,7 @@ window.addEventListener('load', () => {
     }
 });
 
-// ===== SIDEBAR MENU =====
+// The sidebar Menu
 const sidebar = document.getElementById("sidebar");
 const menuBtn = document.getElementById("menuBtn");
 const closeBtn = document.getElementById("closeBtn");
@@ -57,7 +57,7 @@ if (closeBtn && sidebar) {
     });
 }
 
-// ===== EVENT RENDERING =====
+// event rendering
 function renderEventsGrid() {
     const eventsGrid = document.querySelector('.events-grid');
     const events = eventManager.getActiveEvents(); // Only show active events to students
@@ -115,7 +115,7 @@ function renderEventsGrid() {
     }).join("");
 }
 
-// ===== SEARCH FUNCTIONALITY =====
+// Search
 function setupSearch() {
     const searchInput = document.getElementById("searchInput");
     const searchClear = document.getElementById("searchClear");
@@ -195,7 +195,7 @@ function setupSearch() {
     }
 }
 
-// ===== NAVIGATION =====
+// nav
 function navigateToBuyTicket(eventTitle, eventPrice) {
     const event = eventManager.getActiveEvents().find(e => e.name === eventTitle);
     if (event) {
