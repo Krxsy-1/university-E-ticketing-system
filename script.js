@@ -48,8 +48,8 @@ const loginForm = document.getElementById("loginForm");
 
                 if (adminEmail === "admin@university.edu" && adminPassword === "admin1234") {
                     alert("Login successful! Welcome, Administrator.");
-                    // Redirect to admin dashboard (create admin-dashboard.html later)
-                    window.location.href = "admin-dashboard.html";
+                    // Redirect to admin dashboard (create administrator.html later)
+                    window.location.href = "administrator.html";
                 } else {
                     alert("Invalid credentials. Use demo: admin@university.edu / admin1234");
                 }
@@ -71,8 +71,9 @@ const loginForm = document.getElementById("loginForm");
             }
         }
 
-        const savedTheme = localStorage.getItem("unitickets-theme");
-        applyTheme(savedTheme || "light");
+        // Get saved theme (already applied in HEAD, but update toggle state)
+        const currentTheme = localStorage.getItem("unitickets-theme");
+        applyTheme(currentTheme || "light");
 
         toggle.addEventListener("change", () => {
         const newTheme = toggle.checked ? "dark" : "light";

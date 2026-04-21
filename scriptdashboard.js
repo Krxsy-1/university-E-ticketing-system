@@ -1,96 +1,214 @@
-// Hide loader when page fully loads
-    window.addEventListener('load', () => {
-        const loader = document.getElementById('loaderOverlay');
-        if (loader) {
-            loader.classList.add('hidden');
-        }
-    });
+/**
+ * Student Dashboard Script
+ * Displays events from EventManager (synced with Admin dashboard)
+ */
 
-    // Dark mode toggle - synced across pages
-    const toggle = document.getElementById("darkToggle");
-    const body = document.body;
+// Initialize EventManager
+const eventManager = new EventManager();
 
-    function applyTheme(theme) {
-      if (theme === "dark") {
+// ===== THEME MANAGEMENT =====
+const toggle = document.getElementById("darkToggle");
+const body = document.body;
+
+function applyTheme(theme) {
+    if (theme === "dark") {
         body.classList.add("dark");
         if (toggle) toggle.checked = true;
-      } else {
+    } else {
         body.classList.remove("dark");
         if (toggle) toggle.checked = false;
-      }
     }
+}
 
-    const savedTheme = localStorage.getItem("unitickets-theme");
-    applyTheme(savedTheme || "light");
+const savedTheme = localStorage.getItem("unitickets-theme");
+applyTheme(savedTheme || "light");
 
-    if (toggle) {
-      toggle.addEventListener("change", () => {
+if (toggle) {
+    toggle.addEventListener("change", () => {
         const newTheme = toggle.checked ? "dark" : "light";
         applyTheme(newTheme);
         localStorage.setItem("unitickets-theme", newTheme);
-      });
+    });
+}
+
+// Hide loader when page fully loads
+window.addEventListener('load', () => {
+    const loader = document.getElementById('loaderOverlay');
+    if (loader) {
+        loader.classList.add('hidden');
+    }
+});
+
+// ===== SIDEBAR MENU =====
+const sidebar = document.getElementById("sidebar");
+const menuBtn = document.getElementById("menuBtn");
+const closeBtn = document.getElementById("closeBtn");
+
+if (menuBtn && sidebar) {
+    menuBtn.addEventListener("click", () => {
+        sidebar.classList.add("active");
+    });
+}
+
+if (closeBtn && sidebar) {
+    closeBtn.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+    });
+}
+
+// ===== EVENT RENDERING =====
+function renderEventsGrid() {
+    const eventsGrid = document.querySelector('.events-grid');
+    const events = eventManager.getActiveEvents(); // Only show active events to students
+
+    if (!eventsGrid) return;
+
+    if (events.length === 0) {
+        eventsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><p>No events available at the moment.</p></div>';
+        return;
     }
 
-    // Theme toggle
-    const themeToggle = document.getElementById("themeToggle");
-    const themeToggleSecondary = document.getElementById("themeToggleSecondary");
+    eventsGrid.innerHTML = events.map(event => {
+        const ticketsRemaining = event.maxTickets - event.soldTickets;
+        const isAlmostFull = ticketsRemaining < 10;
 
-    function syncThemeIcon() {
-      const icon = themeToggle?.querySelector("i");
-      if (icon) {
-        if (body.classList.contains("dark")) {
-          icon.classList.remove("fa-moon");
-          icon.classList.add("fa-sun");
-        } else {
-          icon.classList.remove("fa-sun");
-          icon.classList.add("fa-moon");
-        }
-      }
-    }
+        return `
+            <article class="event-card">
+                <div class="event-banner">
+                    <img src="${event.image}" alt="${event.name}">
+                    <div class="event-tag">
+                        <i class="fa-solid fa-${isAlmostFull ? 'fire' : 'bolt'}"></i>
+                        ${isAlmostFull ? 'Almost Full' : 'Featured'}
+                    </div>
+                </div>
 
-    function toggleTheme() {
-      body.classList.toggle("dark");
-      const newTheme = body.classList.contains("dark") ? "dark" : "light";
-      localStorage.setItem("unitickets-theme", newTheme);
-      syncThemeIcon();
-      if (toggle) toggle.checked = body.classList.contains("dark");
-    }
+                <div class="event-details">
+                    <div class="event-date-time">
+                        <i class="fa-solid fa-calendar"></i>
+                        ${event.date} <span style="margin: 0 8px;">•</span> ${event.time}
+                    </div>
 
-    if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
-    if (themeToggleSecondary) themeToggleSecondary.addEventListener("click", toggleTheme);
+                    <h3 class="event-title">${event.name}</h3>
 
-    syncThemeIcon();
+                    <div class="event-info">
+                        <span>
+                            <i class="fa-solid fa-location-dot"></i>
+                            ${event.location}
+                        </span>
+                        <span>
+                            <i class="fa-solid fa-users"></i>
+                            ${event.soldTickets}/${event.maxTickets} going
+                        </span>
+                    </div>
 
-    // Search clear
+                    <div class="event-footer">
+                        <span class="event-price">${event.price === 0 ? 'Free' : '₦' + event.price.toLocaleString()}</span>
+                        <button class="btn btn-primary" onclick="navigateToBuyTicket('${event.name}', ${event.price})">
+                            <i class="fa-solid fa-ticket"></i>
+                            Buy Ticket
+                        </button>
+                    </div>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+// ===== SEARCH FUNCTIONALITY =====
+function setupSearch() {
     const searchInput = document.getElementById("searchInput");
     const searchClear = document.getElementById("searchClear");
 
-    if (searchClear) {
-      searchClear.addEventListener("click", () => {
-        searchInput.value = "";
-        searchInput.focus();
-      });
-    }
-    // Make Buy Ticket buttons navigate to buyTicket.html with event details
-    (function () {
-      function attachBuyHandlers() {
-        const buyButtons = document.querySelectorAll('.event-actions .btn-primary, .event-actions .btn');
-        buyButtons.forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const card = e.target.closest('.event-card');
-            if (!card) return;
-            const title = card.querySelector('.event-title')?.innerText.trim() || 'Event';
-            const price = card.querySelector('.event-price-main')?.innerText.trim() || '';
-            const href = `buyTicket.html?event=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}`;
-            // navigate to buy page
-            window.location.href = href;
-          });
-        });
-      }
+    if (!searchInput) return;
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', attachBuyHandlers);
-      } else {
-        attachBuyHandlers();
-      }
-    })();
+    searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.trim();
+        
+        if (query) {
+            searchClear.style.display = "block";
+            const results = eventManager.searchEvents(query);
+            
+            const eventsGrid = document.querySelector('.events-grid');
+            if (eventsGrid) {
+                if (results.length === 0) {
+                    eventsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><p>No events match your search.</p></div>';
+                } else {
+                    eventsGrid.innerHTML = results.map(event => {
+                        const ticketsRemaining = event.maxTickets - event.soldTickets;
+                        const isAlmostFull = ticketsRemaining < 10;
+
+                        return `
+                            <article class="event-card">
+                                <div class="event-banner">
+                                    <img src="${event.image}" alt="${event.name}">
+                                    <div class="event-tag">
+                                        <i class="fa-solid fa-${isAlmostFull ? 'fire' : 'bolt'}"></i>
+                                        ${isAlmostFull ? 'Almost Full' : 'Featured'}
+                                    </div>
+                                </div>
+
+                                <div class="event-details">
+                                    <div class="event-date-time">
+                                        <i class="fa-solid fa-calendar"></i>
+                                        ${event.date} <span style="margin: 0 8px;">•</span> ${event.time}
+                                    </div>
+
+                                    <h3 class="event-title">${event.name}</h3>
+
+                                    <div class="event-info">
+                                        <span>
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            ${event.location}
+                                        </span>
+                                        <span>
+                                            <i class="fa-solid fa-users"></i>
+                                            ${event.soldTickets}/${event.maxTickets} going
+                                        </span>
+                                    </div>
+
+                                    <div class="event-footer">
+                                        <span class="event-price">${event.price === 0 ? 'Free' : '₦' + event.price.toLocaleString()}</span>
+                                        <button class="btn btn-primary" onclick="navigateToBuyTicket('${event.name}', ${event.price})">
+                                            <i class="fa-solid fa-ticket"></i>
+                                            Buy Ticket
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                    }).join("");
+                }
+            }
+        } else {
+            searchClear.style.display = "none";
+            renderEventsGrid();
+        }
+    });
+
+    if (searchClear) {
+        searchClear.addEventListener("click", () => {
+            searchInput.value = "";
+            searchClear.style.display = "none";
+            renderEventsGrid();
+        });
+    }
+}
+
+// ===== NAVIGATION =====
+function navigateToBuyTicket(eventTitle, eventPrice) {
+    const event = eventManager.getActiveEvents().find(e => e.name === eventTitle);
+    if (event) {
+        window.location.href = `buyTicket.html?title=${encodeURIComponent(event.name)}&price=${event.price}`;
+    }
+}
+
+// ===== INITIALIZATION =====
+renderEventsGrid();
+setupSearch();
+
+// ===== LISTEN FOR ADMIN UPDATES =====
+// When admin creates/edits/deletes events, the student dashboard will auto-update
+window.addEventListener('eventsUpdated', () => {
+    console.log("Events updated by admin, refreshing dashboard...");
+    renderEventsGrid();
+});

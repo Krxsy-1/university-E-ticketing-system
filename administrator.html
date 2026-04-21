@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — UniTickets</title>
+    <link rel="stylesheet" href="dashboardStyles.css">
+    <link rel="stylesheet" href="administrator.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <script>
+        // Apply theme immediately before page renders (prevents flash of light mode)
+        (function() {
+            const savedTheme = localStorage.getItem('unitickets-theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-container">
+            <div class="spinner"></div>
+            <div class="loader-text">
+                Loading<span class="loader-dots"><span>.</span><span>.</span><span>.</span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-shell">
+        <header class="navbar">
+            <div class="nav-left">
+                <div class="nav-logo">A</div>
+                <div class="nav-title">
+                    <span>UniTickets Admin</span>
+                    <span>Event Management System</span>
+                </div>
+            </div>
+
+            <div class="nav-right">
+                <button class="icon-button" id="themeToggle">
+                    <i class="fa-regular fa-moon"></i>
+                </button>
+                <div class="profile-chip">
+                    <div class="profile-avatar">AD</div>
+                    <div class="profile-info">
+                        <span>Administrator</span>
+                        <span>System Admin</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main style="padding: 30px;">
+            <!-- Admin Header -->
+            <div class="admin-header">
+                <div class="admin-title">
+                    <h1>Event Management</h1>
+                    <p>Create, edit, and manage campus events</p>
+                </div>
+                <div class="admin-actions">
+                    <button class="btn btn-primary" id="createEventBtn">
+                        <i class="fa-solid fa-plus"></i>
+                        Create Event
+                    </button>
+                    <button class="btn btn-ghost" id="refreshBtn">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <h3>Total Events</h3>
+                    <div class="value" id="totalEvents">12</div>
+                    <div class="meta">Active this month</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Tickets Sold</h3>
+                    <div class="value" id="totalTickets">1,245</div>
+                    <div class="meta">+180 this week</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Revenue Generated</h3>
+                    <div class="value" id="totalRevenue">₦3.7M</div>
+                    <div class="meta">YTD total</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Active Students</h3>
+                    <div class="value" id="activeStudents">847</div>
+                    <div class="meta">With registered tickets</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="events">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    Events
+                </button>
+                <button class="tab-btn" data-tab="students">
+                    <i class="fa-solid fa-users"></i>
+                    Student Purchases
+                </button>
+                <button class="tab-btn" data-tab="reports">
+                    <i class="fa-solid fa-chart-line"></i>
+                    Analytics & Reports
+                </button>
+                <button class="tab-btn" data-tab="settings">
+                    <i class="fa-solid fa-cog"></i>
+                    Settings
+                </button>
+            </div>
+
+            <!-- Events Tab -->
+            <div id="events-tab" class="tab-content active">
+                <div class="events-table">
+                    <div class="table-header">
+                        <div>Event Name</div>
+                        <div>Date & Time</div>
+                        <div>Tickets Sold</div>
+                        <div>Price</div>
+                        <div>Actions</div>
+                    </div>
+                    <div id="eventsTableBody">
+                        <!-- Events will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="students-tab" class="tab-content">
+                <div style="margin-bottom: 16px;">
+                    <input type="text" id="studentSearch" class="search-input" placeholder="Search by student name, ID, or email..." style="width: 100%; padding: 12px 14px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-soft); color: var(--text-main);">
+                </div>
+                <div class="students-list" id="studentsList">
+                    <!-- Students will be populated here -->
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reports-tab" class="tab-content">
+                <div style="background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 24px; border: 1px solid var(--border-subtle);">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Ticket Sales Trend</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Sales overview for the last 30 days</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 24px;">
+                        <!-- Chart bars (simple bars for demo) -->
+                        <div style="text-align: center;">
+                            <div style="height: 80px; background: var(--accent-soft); border-radius: 6px; margin-bottom: 6px;"></div>
+                            <p style="font-size: 11px; color: var(--text-muted);">Mon</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="height: 120px; background: var(--accent-soft); border-radius: 6px; margin-bottom: 6px;"></div>
+                            <p style="font-size: 11px; color: var(--text-muted);">Tue</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="height: 95px; background: var(--accent-soft); border-radius: 6px; margin-bottom: 6px;"></div>
+                            <p style="font-size: 11px; color: var(--text-muted);">Wed</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="height: 110px; background: var(--accent-soft); border-radius: 6px; margin-bottom: 6px;"></div>
+                            <p style="font-size: 11px; color: var(--text-muted);">Thu</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="height: 140px; background: var(--accent); border-radius: 6px; margin-bottom: 6px;"></div>
+                            <p style="font-size: 11px; color: var(--text-muted);">Fri</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="height: 130px; background: var(--accent-soft); border-radius: 6px; margin-bottom: 6px;"></div>
+                            <p style="font-size: 11px; color: var(--text-muted);">Sat</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="height: 100px; background: var(--accent-soft); border-radius: 6px; margin-bottom: 6px;"></div>
+                            <p style="font-size: 11px; color: var(--text-muted);">Sun</p>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div style="padding: 12px; background: var(--bg-soft); border-radius: 8px;">
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Peak Sales Day</p>
+                            <p style="font-size: 18px; font-weight: 700; color: var(--accent);">Friday</p>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-soft); border-radius: 8px;">
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Avg Daily Sales</p>
+                            <p style="font-size: 18px; font-weight: 700; color: var(--accent);">178 tickets</p>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-soft); border-radius: 8px;">
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Conversion Rate</p>
+                            <p style="font-size: 18px; font-weight: 700; color: var(--accent);">34.2%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content">
+                <div style="background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 24px; border: 1px solid var(--border-subtle); max-width: 600px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">System Settings</h3>
+                    
+                    <div style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px;">Email Notifications</p>
+                                <p style="font-size: 12px; color: var(--text-muted);">Send email on ticket purchases</p>
+                            </div>
+                            <label class="toggle-switch" style="margin: 0;">
+                                <input type="checkbox" checked />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px;">Event Approval Required</p>
+                                <p style="font-size: 12px; color: var(--text-muted);">Require approval before publishing</p>
+                            </div>
+                            <label class="toggle-switch" style="margin: 0;">
+                                <input type="checkbox" />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="padding-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px;">Dark Mode</p>
+                                <p style="font-size: 12px; color: var(--text-muted);">Enable dark mode for admin panel</p>
+                            </div>
+                            <label class="toggle-switch" style="margin: 0;" id="darkModeToggle">
+                                <input type="checkbox" id="settingsDarkToggle" />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Create New Event</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+
+            <form id="eventForm">
+                <div class="form-group">
+                    <label>Event Name</label>
+                    <input type="text" id="eventName" placeholder="e.g., Tech Innovation Night" required />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Date</label>
+                        <input type="date" id="eventDate" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Event Time</label>
+                        <input type="time" id="eventTime" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Location/Venue</label>
+                    <input type="text" id="eventLocation" placeholder="e.g., PFA Main Auditorium" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="eventDescription" placeholder="Describe the event..." required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ticket Price (₦)</label>
+                        <input type="number" id="eventPrice" placeholder="0" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Max Tickets</label>
+                        <input type="number" id="eventMaxTickets" placeholder="500" min="1" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Event Category</label>
+                    <select id="eventCategory" required>
+                        <option value="">Select category</option>
+                        <option value="academic">Academic</option>
+                        <option value="social">Social</option>
+                        <option value="music">Live Music</option>
+                        <option value="sports">Sports</option>
+                        <option value="career">Career Fair</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        <i class="fa-solid fa-save"></i>
+                        Save Event
+                    </button>
+                    <button type="button" class="btn btn-ghost" id="modalCancel" style="flex: 1;">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="eventManager.js"></script>
+    <script src="scriptAdministrator.js"></script>
+</body>
+</html>
