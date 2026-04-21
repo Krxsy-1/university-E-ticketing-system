@@ -4,7 +4,8 @@
  */
 
 // Initialize EventManager
-const eventManager = new EventManager();
+// Use the shared EventManager instance created in eventManager.js
+// (no re-instantiation here to avoid duplicate declarations)
 
 // ===== THEME MANAGEMENT =====
 const toggle = document.getElementById("darkToggle");

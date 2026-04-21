@@ -5,7 +5,8 @@
  */
 
 // Initialize EventManager
-const eventManager = new EventManager();
+// Use the shared EventManager instance created in eventManager.js
+// (no re-instantiation here to avoid duplicate declarations)
 
 // ===== THEME MANAGEMENT =====
 const themeToggle = document.getElementById("themeToggle");
@@ -230,9 +231,9 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
 
 // ===== STUDENT DATA =====
 const studentData = [
-    { id: 1, name: "Kristen Okafor", matric: "201109012", email: "kristen@university.edu", tickets: 3, spent: 9500, eventsBought: ["Tech Innovation Night", "Literary & Arts Night", "Campus Live Concert"] },
+    { id: 1, name: "Kristen Osheku", matric: "201109012", email: "kristen@university.edu", tickets: 3, spent: 9500, eventsBought: ["Tech Innovation Night", "Literary & Arts Night", "Campus Live Concert"] },
     { id: 2, name: "Chioma Ibrahim", matric: "201110045", email: "chioma@university.edu", tickets: 2, spent: 8000, eventsBought: ["Campus Live Concert", "Literary & Arts Night"] },
-    { id: 3, name: "Adebayo Smith", matric: "201108932", email: "adebayo@university.edu", tickets: 1, spent: 5000, eventsBought: ["Campus Live Concert"] },
+    { id: 3, name: "Morayo Bakare", matric: "201108932", email: "morayo@university.edu", tickets: 1, spent: 5000, eventsBought: ["Campus Live Concert"] },
     { id: 4, name: "Zainab Ahmed", matric: "201109567", email: "zainab@university.edu", tickets: 4, spent: 13500, eventsBought: ["Tech Innovation Night", "Literary & Arts Night", "Campus Live Concert", "Career & Internship Fair"] },
     { id: 5, name: "Emeka Okoro", matric: "201111234", email: "emeka@university.edu", tickets: 2, spent: 6500, eventsBought: ["Tech Innovation Night", "Career & Internship Fair"] }
 ];
