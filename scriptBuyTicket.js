@@ -117,13 +117,30 @@
             setTimeout(() => URL.revokeObjectURL(url), 5000);
         }
 
-        function openMailClient(email, subject, body) {
-            const mailto = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            // Open in new window/tab to avoid navigating away
-            window.open(mailto, '_blank');
+        async function sendTicketEmail(purchase) {
+            try {
+                const response = await fetch('http://localhost:3000/api/send-ticket', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(purchase)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to send ticket');
+                }
+
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Ticket email error:', error);
+                throw error;
+            }
         }
 
-        function handleProceed() {
+        async function handleProceed() {
             const buyer = document.getElementById('buyerName').value.trim();
             const matric = document.getElementById('buyerMatricNumber').value.trim();
             const dept = document.getElementById('buyerDepartment').value.trim();
@@ -151,7 +168,8 @@
             }
 
             const unit = parseNumberFromCurrency(price);
-            const total = unit * quantity;
+            const safeUnit  = isNaN(unit) ? 0 : unit;
+            const total = safeUnit * quantity;
             const id = Date.now().toString(36);
             const purchase = {
                 id,
@@ -174,21 +192,24 @@
                 // ignore storage errors
             }
 
-            // Generate ticket and download
-            const ticketHtml = generateTicketHTML(purchase);
-            downloadFile(`uniticket-${id}.html`, ticketHtml, 'text/html');
+            // Show loading state
+            if (window.showInfo) showInfo('Sending ticket', 'Please wait while we send your ticket to ' + email);
 
-            // Prepare mail body (concise) and open mail client
-            const subject = `Your tickets for ${title}`;
-            const body = `Hi ${buyer},\n\nThanks for your purchase.\n\nOrder: ${quantity} x ${title}\nTotal: ₦${total.toLocaleString()}\nOrder ID: ${id}\n\nA printable ticket has been downloaded to your device. You can attach it to this email if you'd like to keep a copy in your inbox.\n\nRegards,\nUniTickets`;
-            openMailClient(email, subject, body);
+            // Send ticket email via backend
+            try {
+                await sendTicketEmail(purchase);
+                
+                // Notify user of success
+                if (window.showSuccess) showSuccess('Ticket sent!', `Your ticket has been sent to ${email}`);
+                else alert(`Purchase successful. Ticket sent to ${email}`);
 
-            // Notify user
-            if (window.showSuccess) showSuccess('Purchase successful', `A ticket download was started and an email draft was opened to ${email}`);
-            else alert(`Purchase successful. Ticket download started and email draft opened for ${email}`);
-
-            // Redirect after short delay
-            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1400);
+                // Redirect after short delay
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+            } catch (error) {
+                if (window.showError) showError('Email send failed', 'Please check if the server is running. You can still download your ticket.');
+                else alert('Failed to send ticket email. Please try again.');
+                console.error(error);
+            }
         }
 
         proceedBtn.addEventListener('click', (e) => {
