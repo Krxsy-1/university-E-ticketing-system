@@ -4,6 +4,24 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
+const fs = require('fs');
+const path = require('path');
+const session = require('express-session');
+
+// Simple server-side logger (keep errors visible)
+const serverLogger = {
+  info: (...args) => console.log('[INFO]', ...args),
+  warn: (...args) => console.warn('[WARN]', ...args),
+  error: (...args) => console.error('[ERROR]', ...args),
+};
+
+// Sessions (very small demo setup)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // secure should be true behind HTTPS in production
+}));
 
 // Middleware
 app.use(cors());
@@ -11,24 +29,102 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 // Email transporter configuration
-// For Gmail: use app password (not regular password)
-// For other services: update these settings
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE || 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+// For Gmail: prefer using app password and secure SMTP (host smtp.gmail.com, port 465)
+// You may also set SMTP_HOST and SMTP_PORT in .env to use a custom server
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASSWORD;
+// Some services (like Gmail) display app passwords with spaces when copying from UI.
+// Normalize by trimming and removing whitespace so pasted keys still work.
+const EMAIL_PASS_CLEAN = EMAIL_PASS ? EMAIL_PASS.trim().replace(/\s+/g, '') : EMAIL_PASS;
+const EMAIL_SERVICE = process.env.EMAIL_SERVICE;
+const SMTP_HOST = process.env.SMTP_HOST;
+const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
 
-// Verify transporter connection
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Email transporter error:', error);
-  } else {
-    console.log('Email service ready:', success);
+if (!EMAIL_USER || !EMAIL_PASS_CLEAN) {
+  console.error('❌ Missing EMAIL_USER or EMAIL_PASSWORD in environment. Email sending will fail.');
+}
+
+let transporterOptions;
+if (SMTP_HOST && SMTP_PORT) {
+  transporterOptions = {
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465, // true for 465, false for other ports
+  auth: { user: EMAIL_USER, pass: EMAIL_PASS_CLEAN },
+  };
+} else if ((EMAIL_SERVICE || '').toLowerCase() === 'gmail' || !EMAIL_SERVICE) {
+  // Explicitly use Gmail SMTP with secure option
+  transporterOptions = {
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+  auth: { user: EMAIL_USER, pass: EMAIL_PASS_CLEAN },
+  };
+} else {
+  transporterOptions = {
+    service: EMAIL_SERVICE,
+  auth: { user: EMAIL_USER, pass: EMAIL_PASS_CLEAN },
+  };
+}
+
+const transporter = nodemailer.createTransport(transporterOptions);
+
+// Verify transporter connection (async)
+(async () => {
+  try {
+    await transporter.verify();
+    console.log('✅ Email transporter verified and ready');
+  } catch (err) {
+    console.error('❌ Email transporter verification failed');
+    console.error('   message:', err && err.message);
+    console.error('   code:', err && err.code);
+    console.error('   response:', err && err.response);
+    console.error('   transporter options:', JSON.stringify({ host: transporterOptions.host || null, port: transporterOptions.port || null, service: transporterOptions.service || null }));
+    console.error('   Make sure you created an app password (for Gmail) and set EMAIL_USER and EMAIL_PASSWORD in .env');
   }
-});
+})();
+
+// helper to check config
+function emailConfigStatus() {
+  return {
+    user: EMAIL_USER ? true : false,
+    hasPassword: EMAIL_PASS ? true : false,
+    usingCustomSMTP: !!(SMTP_HOST && SMTP_PORT),
+    service: EMAIL_SERVICE || null,
+    smtpHost: SMTP_HOST || null,
+    smtpPort: SMTP_PORT || null,
+  };
+}
+
+// Simple purchases persistence (JSON file)
+const DATA_DIR = path.join(__dirname, 'data');
+const PURCHASES_FILE = path.join(DATA_DIR, 'purchases.json');
+
+function ensureDataDir() {
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(PURCHASES_FILE)) fs.writeFileSync(PURCHASES_FILE, '[]');
+}
+
+function savePurchase(purchase) {
+  ensureDataDir();
+  const raw = fs.readFileSync(PURCHASES_FILE, 'utf8');
+  const arr = JSON.parse(raw || '[]');
+  arr.push(purchase);
+  fs.writeFileSync(PURCHASES_FILE, JSON.stringify(arr, null, 2));
+}
+
+function readPurchases() {
+  ensureDataDir();
+  const raw = fs.readFileSync(PURCHASES_FILE, 'utf8');
+  return JSON.parse(raw || '[]');
+}
+
+// Simple admin check middleware (demo only)
+function requireAdmin(req, res, next) {
+  // example: session flag
+  if (req.session && req.session.isAdmin) return next();
+  return res.status(401).json({ error: 'Unauthorized' });
+}
 
 // Generate HTML email ticket
 function generateTicketEmail(purchase) {
@@ -143,27 +239,74 @@ app.post('/api/send-ticket', async (req, res) => {
       to: purchase.email,
       subject: `Your UniTickets Confirmation - ${purchase.title}`,
       html: emailHtml,
-      text: `Ticket for ${title}\nOrder ID: ${id}\nTotal: ₦${safeTotal}`,
+      text: `Ticket for ${purchase.title}\nOrder ID: ${purchase.id}\nTotal: ₦${purchase.total}`,
     };
 
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+
+    // persist purchase (best-effort)
+    try { savePurchase(Object.assign({}, purchase, { sentAt: new Date().toISOString(), mailInfo: info })); } catch (e) { serverLogger.warn('Failed to save purchase:', e && e.message); }
 
     res.json({ 
       success: true, 
-      message: 'Ticket sent successfully to ' + purchase.email 
+      message: 'Ticket sent successfully to ' + purchase.email,
+      info
     });
   } catch (error) {
-    console.error('Email send error:', error);
+    serverLogger.error('❌ Email send error:', error && error.message);
+    serverLogger.error('   Code:', error && error.code);
+    serverLogger.error('   Response:', error && error.response);
     res.status(500).json({ 
       error: 'Failed to send ticket email',
-      details: error.message 
+      details: error && error.message,
+      code: error && error.code
     });
   }
 });
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), emailConfig: emailConfigStatus() });
+});
+
+// Debug endpoint: attempt to send a quick test email to ?to=you@domain
+app.get('/api/test-email', async (req, res) => {
+  const to = req.query.to;
+  if (!to) return res.status(400).json({ error: 'Missing `to` query parameter' });
+
+  const mailOptions = {
+    from: EMAIL_USER || 'noreply@unitickets.edu',
+    to,
+    subject: 'UniTickets - Test email',
+    text: 'This is a test email from UniTickets server. If you received this, SMTP is working.'
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    res.json({ success: true, info });
+  } catch (err) {
+    serverLogger.error('Test email send failed:', err && err.message);
+    res.status(500).json({ success: false, error: err && err.message, code: err && err.code, response: err && err.response });
+  }
+});
+
+// purchases endpoints
+app.post('/api/purchase', (req, res) => {
+  const p = req.body;
+  if (!p || !p.id) return res.status(400).json({ error: 'Missing purchase data' });
+  try { savePurchase(Object.assign({}, p, { recordedAt: new Date().toISOString() })); } catch (e) { serverLogger.error('Failed to save purchase:', e && e.message); return res.status(500).json({ error: 'Failed to save' }); }
+  res.json({ success: true });
+});
+
+app.get('/api/purchases', requireAdmin, (req, res) => {
+  try { const arr = readPurchases(); res.json({ success: true, purchases: arr }); } catch (e) { serverLogger.error('Failed to read purchases:', e && e.message); res.status(500).json({ error: 'Failed to read' }); }
+});
+
+// simple admin login for demo (sets session flag) - POST /api/admin-login { email, password }
+app.post('/api/admin-login', (req, res) => {
+  const { email, password } = req.body || {};
+  if (email === 'admin@university.edu' && password === 'admin1234') { req.session.isAdmin = true; return res.json({ success: true }); }
+  return res.status(401).json({ error: 'Invalid admin credentials' });
 });
 
 // Start server

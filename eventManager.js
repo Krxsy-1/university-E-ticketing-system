@@ -81,7 +81,7 @@ class EventManager {
             const events = localStorage.getItem(this.storageKey);
             return events ? JSON.parse(events) : [];
         } catch (error) {
-            console.error("Error reading events:", error);
+            if (window.logger && window.logger.error) window.logger.error("Error reading events:", error);
             return [];
         }
     }
@@ -103,7 +103,7 @@ class EventManager {
             // Trigger custom event to notify all pages of changes
             window.dispatchEvent(new CustomEvent('eventsUpdated', { detail: { events } }));
         } catch (error) {
-            console.error("Error saving events:", error);
+            if (window.logger && window.logger.error) window.logger.error("Error saving events:", error);
         }
     }
 

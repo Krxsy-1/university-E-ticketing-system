@@ -210,6 +210,6 @@ setupSearch();
 // ===== LISTEN FOR ADMIN UPDATES =====
 // When admin creates/edits/deletes events, the student dashboard will auto-update
 window.addEventListener('eventsUpdated', () => {
-    console.log("Events updated by admin, refreshing dashboard...");
+    if (window.logger && window.logger.log) window.logger.log('Events updated by admin, refreshing dashboard...');
     renderEventsGrid();
 });

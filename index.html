@@ -19,6 +19,8 @@
     </script>
 </head>
 <body>
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
     <div class="toggle">
         <span class="toggle-label">
             <i class="fa-regular fa-moon"></i>
@@ -143,14 +145,17 @@
                     </a>
                 </p>
 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="loginButton">
                     <i class="fa-solid fa-right-to-bracket"></i>
-                    Login
+                    <span id="loginBtnText">Login</span>
+                    <span class="btn-spinner" id="loginSpinner" style="display:none;"><span class="spinner"></span></span>
                 </button>
             </form>
         </section>
     </main>
 
+    <script src="logger.js"></script>
     <script src="script.js"></script>
-</body>
+    <script src="toast.js"></script>
+  </body>
 </html>

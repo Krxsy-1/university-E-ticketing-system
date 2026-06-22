@@ -330,6 +330,33 @@ body.dark .mode-btn.active {
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
 }
 
+/* Small spinner for login button */
+.btn-spinner {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 8px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-top-color: rgba(255,255,255,0.95);
+  animation: spin 0.9s linear infinite;
+}
+
+body.dark .spinner {
+  border: 2px solid rgba(0,0,0,0.12);
+  border-top-color: rgba(255,255,255,0.95);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .forgot {
   text-align: right;
   font-size: 0.85rem;

@@ -32,26 +32,43 @@ const loginForm = document.getElementById("loginForm");
         loginForm.addEventListener("submit", (e) => {
             e.preventDefault();
 
+            // show spinner and disable login button for feedback
+            const loginBtn = document.getElementById('loginButton');
+            const spinner = document.getElementById('loginSpinner');
+            const btnText = document.getElementById('loginBtnText');
+            if (loginBtn) loginBtn.disabled = true;
+            if (spinner) spinner.style.display = 'inline-grid';
+            if (btnText) btnText.style.opacity = '0.6';
+
             if (loginMode === "student") {
                 const studentId = document.getElementById("studentId").value.trim();
                 const password = document.getElementById("password").value.trim();
 
                 if (studentId === "201109012" && password === "demo1234") {
-                    alert("Login successful! Welcome, Student.");
-                    window.location.href = "dashboard.html";
+                    // Successful login - give a quick visual pause then redirect
+                    setTimeout(() => { window.location.href = "dashboard.html"; }, 600);
                 } else {
-                    alert("Invalid credentials. Use demo: 201109012 / demo1234");
+                    if (window.showError) showError('Invalid credentials', 'Use demo: 201109012 / demo1234'); else alert("Invalid credentials. Use demo: 201109012 / demo1234");
+                    if (window.logger && window.logger.warn) window.logger.warn('Student login failed for', studentId);
+                    // restore button state
+                    if (loginBtn) loginBtn.disabled = false;
+                    if (spinner) spinner.style.display = 'none';
+                    if (btnText) btnText.style.opacity = '1';
                 }
             } else {
                 const adminEmail = document.getElementById("adminEmail").value.trim();
                 const adminPassword = document.getElementById("adminPassword").value.trim();
 
                 if (adminEmail === "admin@university.edu" && adminPassword === "admin1234") {
-                    alert("Login successful! Welcome, Administrator.");
-                    // Redirect to admin dashboard (create administrator.html later)
-                    window.location.href = "administrator.html";
+                    // Successful admin login - give a quick visual pause then redirect
+                    setTimeout(() => { window.location.href = "administrator.html"; }, 600);
                 } else {
-                    alert("Invalid credentials. Use demo: admin@university.edu / admin1234");
+                    if (window.showError) showError('Invalid credentials', 'Use demo: admin@university.edu / admin1234'); else alert("Invalid credentials. Use demo: admin@university.edu / admin1234");
+                    if (window.logger && window.logger.warn) window.logger.warn('Admin login failed for', adminEmail);
+                    // restore button state
+                    if (loginBtn) loginBtn.disabled = false;
+                    if (spinner) spinner.style.display = 'none';
+                    if (btnText) btnText.style.opacity = '1';
                 }
             }
         });

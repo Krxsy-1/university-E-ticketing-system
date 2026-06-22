@@ -88,6 +88,10 @@
                         <i class="fa-solid fa-times"></i>
                         Cancel
                     </button>
+                        <button id="downloadTicketBtn" class="btn btn-success" style="display:none;margin-left:8px;">
+                            <i class="fa-solid fa-ticket"></i>
+                            Download Ticket
+                        </button>
                 </div>
             </div>
 
@@ -130,59 +134,8 @@
         </div>
     </div>
 
+    <script src="logger.js"></script>
     <script src="scriptBuyTicket.js"></script>
-
-    <!-- Toast Notification System -->
-    <script>
-      window.showToast = function(title, message = '', type = 'info', duration = 4000) {
-        const container = document.getElementById('toastContainer');
-        if (!container) return;
-
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-
-        const iconMap = {
-          success: 'fa-check-circle',
-          error: 'fa-exclamation-circle',
-          warning: 'fa-exclamation-triangle',
-          info: 'fa-info-circle'
-        };
-
-        toast.innerHTML = `
-          <div class="toast-icon">
-            <i class="fa-solid ${iconMap[type]}"></i>
-          </div>
-          <div class="toast-content">
-            <div class="toast-title">${title}</div>
-            ${message ? `<div class="toast-message">${message}</div>` : ''}
-          </div>
-          <button class="toast-close" aria-label="Close notification">
-            <i class="fa-solid fa-times"></i>
-          </button>
-        `;
-
-        container.appendChild(toast);
-
-        const closeBtn = toast.querySelector('.toast-close');
-        const removeToast = () => {
-          toast.classList.add('removing');
-          setTimeout(() => toast.remove(), 300);
-        };
-
-        closeBtn.addEventListener('click', removeToast);
-
-        if (duration > 0) {
-          setTimeout(removeToast, duration);
-        }
-
-        return { element: toast, close: removeToast };
-      };
-
-      // Convenience functions for common toast types
-      window.showSuccess = (title, message = '') => showToast(title, message, 'success', 4000);
-      window.showError = (title, message = '') => showToast(title, message, 'error', 5000);
-      window.showWarning = (title, message = '') => showToast(title, message, 'warning', 4000);
-      window.showInfo = (title, message = '') => showToast(title, message, 'info', 4000);
-    </script>
+    <script src="toast.js"></script>
 </body>
 </html>

@@ -88,21 +88,106 @@
         const proceedBtnSidebar = document.getElementById('proceedBtnSidebar');
         const cancelBtn = document.getElementById('cancelBtn');
 
+        if (window.logger && window.logger.log) window.logger.log('Button elements found:', { proceedBtn: !!proceedBtn, proceedBtnSidebar: !!proceedBtnSidebar, cancelBtn: !!cancelBtn });
+
         function isValidEmail(email) {
             // Simple RFC-like email check
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
 
-        function generateTicketHTML(purchase) {
-            const { id, title, quantity, total, buyer, matric, dept, email, date } = purchase;
-            return `<!doctype html><html><head><meta charset="utf-8"><title>Ticket - ${title}</title>
-            <style>body{font-family:Inter,system-ui,Arial,sans-serif;padding:20px;color:#111827} .ticket{max-width:680px;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;padding:20px} .header{display:flex;justify-content:space-between;align-items:center} .title{font-weight:700;font-size:20px;color:#4f46e5} .meta{margin-top:12px;font-size:14px;color:#374151} .section{margin-top:18px} .qr{width:120px;height:120px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#9ca3af}</style>
-            </head><body><div class="ticket"><div class="header"><div><div class="title">${title}</div><div style="font-size:12px;color:#6b7280">UniTickets</div></div><div><strong>Ticket #${id}</strong></div></div>
-            <div class="meta">Date: ${date} • Quantity: ${quantity} • Total: ₦${total.toLocaleString()}</div>
-            <div class="section"><strong>Buyer</strong><div style="margin-top:6px">${buyer} • ${matric} • ${dept}</div></div>
-            <div class="section"><strong>Contact</strong><div style="margin-top:6px">${email}</div></div>
-            <div class="section" style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px;color:#9ca3af">Present this ticket at the event entrance.</div><div class="qr">QR</div></div>
-            </div></body></html>`;
+                function generateTicketHTML(purchase) {
+                        const { id, title, quantity, total, buyer, matric, dept, email, date } = purchase;
+                        return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Ticket - ${title}</title>
+                        <meta name="viewport" content="width=device-width,initial-scale=1" />
+                        <style>
+                                :root {
+                                    --bg: #f5f6fb;
+                                    --bg-elevated: #fff;
+                                    --text-main: #111827;
+                                    --text-muted: #6b7280;
+                                    --accent: #4f46e5;
+                                    --border-subtle: #e5e7eb;
+                                    --radius-lg: 18px;
+                                }
+                                body.dark {
+                                    --bg: #050816;
+                                    --bg-elevated: #0b1020;
+                                    --text-main: #e5e7eb;
+                                    --text-muted: #9ca3af;
+                                    --accent: #6366f1;
+                                    --border-subtle: #1f2933;
+                                }
+                                body {
+                                    background: radial-gradient(circle at top left, #e0e7ff 0, var(--bg) 40%, var(--bg) 100%);
+                                    color: var(--text-main);
+                                    font-family: Inter, system-ui, Arial, sans-serif;
+                                    padding: 20px;
+                                    margin: 0;
+                                    transition: background 0.3s;
+                                }
+                                body.dark {
+                                    background: radial-gradient(circle at top left, #111827 0, #020617 40%, #020617 100%);
+                                }
+                                .ticket {
+                                    max-width: 680px;
+                                    margin: 0 auto;
+                                    border: 1px solid var(--border-subtle);
+                                    border-radius: 12px;
+                                    background: var(--bg-elevated);
+                                    padding: 24px 20px;
+                                    box-shadow: 0 8px 32px rgba(15,23,42,0.08);
+                                }
+                                .header {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                }
+                                .title {
+                                    font-weight: 700;
+                                    font-size: 22px;
+                                    color: var(--accent);
+                                }
+                                .meta {
+                                    margin-top: 12px;
+                                    font-size: 15px;
+                                    color: var(--text-muted);
+                                }
+                                .section {
+                                    margin-top: 18px;
+                                }
+                                .qr {
+                                    width: 120px;
+                                    height: 120px;
+                                    background: var(--bg-soft, #f3f4f6);
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    border-radius: 8px;
+                                    color: #9ca3af;
+                                    font-size: 32px;
+                                    border: 1px dashed var(--border-subtle);
+                                }
+                                @media (max-width: 600px) {
+                                    .ticket { padding: 12px 4px; }
+                                    .header { flex-direction: column; align-items: flex-start; gap: 8px; }
+                                }
+                        </style>
+                        <script>
+                            // Apply dark mode if user's system or localStorage prefers it
+                            (function() {
+                                const mql = window.matchMedia('(prefers-color-scheme: dark)');
+                                const saved = localStorage.getItem('unitickets-theme');
+                                if (saved === 'dark' || (!saved && mql.matches)) {
+                                    document.body.classList.add('dark');
+                                }
+                            })();
+                        </script>
+                        </head><body><div class="ticket"><div class="header"><div><div class="title">${title}</div><div style="font-size:12px;color:var(--text-muted)">UniTickets</div></div><div><strong>Ticket #${id}</strong></div></div>
+                        <div class="meta">Date: ${date} • Quantity: ${quantity} • Total: ₦${total.toLocaleString()}</div>
+                        <div class="section"><strong>Buyer</strong><div style="margin-top:6px">${buyer} • ${matric} • ${dept}</div></div>
+                        <div class="section"><strong>Contact</strong><div style="margin-top:6px">${email}</div></div>
+                        <div class="section"><div style="font-size:12px;color:var(--text-muted)">Present this ticket at the event entrance.</div></div>
+                        </div></body></html>`;
         }
 
         function downloadFile(filename, content, mime = 'text/html') {
@@ -135,16 +220,19 @@
                 const result = await response.json();
                 return result;
             } catch (error) {
-                console.error('Ticket email error:', error);
+                if (window.logger && window.logger.error) window.logger.error('Ticket email error:', error);
                 throw error;
             }
         }
 
         async function handleProceed() {
+            if (window.logger && window.logger.log) window.logger.log('handleProceed() called');
             const buyer = document.getElementById('buyerName').value.trim();
             const matric = document.getElementById('buyerMatricNumber').value.trim();
             const dept = document.getElementById('buyerDepartment').value.trim();
             const email = document.getElementById('buyerEmail').value.trim();
+
+            if (window.logger && window.logger.log) window.logger.log('Form values:', { buyer, matric, dept, email });
 
             if (!buyer) {
                 if (window.showWarning) showWarning('Missing name', 'Please enter your full name');
@@ -188,6 +276,8 @@
                 const existing = JSON.parse(localStorage.getItem('unitickets-purchases') || '[]');
                 existing.push(purchase);
                 localStorage.setItem('unitickets-purchases', JSON.stringify(existing));
+                // Save latest purchase for ticket page
+                localStorage.setItem('unitickets-latest-purchase', JSON.stringify(purchase));
             } catch (err) {
                 // ignore storage errors
             }
@@ -196,20 +286,21 @@
             if (window.showInfo) showInfo('Sending ticket', 'Please wait while we send your ticket to ' + email);
 
             // Send ticket email via backend
+            let emailSuccess = false;
             try {
                 await sendTicketEmail(purchase);
-                
+                emailSuccess = true;
                 // Notify user of success
                 if (window.showSuccess) showSuccess('Ticket sent!', `Your ticket has been sent to ${email}`);
                 else alert(`Purchase successful. Ticket sent to ${email}`);
-
-                // Redirect after short delay
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
             } catch (error) {
                 if (window.showError) showError('Email send failed', 'Please check if the server is running. You can still download your ticket.');
                 else alert('Failed to send ticket email. Please try again.');
-                console.error(error);
+                if (window.logger && window.logger.error) window.logger.error(error);
             }
+
+            // Redirect to ticket.html to show the ticket
+            window.location.href = 'ticket.html';
         }
 
         proceedBtn.addEventListener('click', (e) => {
@@ -225,4 +316,10 @@
         cancelBtn.addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'dashboard.html';
+        });
+
+        // Hide Download Ticket button on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.getElementById('downloadTicketBtn');
+            if (downloadBtn) downloadBtn.style.display = 'none';
         });
