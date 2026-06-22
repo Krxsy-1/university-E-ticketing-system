@@ -383,10 +383,16 @@ body.dark .spinner {
 @media (max-width: 840px) {
   body {
     padding-inline: 1rem;
+    /* On narrow screens don't vertically center the page; allow natural flow and scrolling */
+    align-items: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .auth {
     flex-direction: column;
+    /* allow internal content to flow and not be clipped on small viewports */
+    overflow: visible;
   }
 
   .left {
@@ -415,6 +421,37 @@ body.dark .spinner {
   }
 
   .toggle {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    padding: 4px 8px;
+    top: 12px;
+    right: 12px;
+    gap: 6px;
+    z-index: 120;
+  }
+
+  /* Reduce toggle switch visual size on very small screens */
+  .toggle-switch {
+    width: 40px;
+    height: 20px;
+  }
+
+  .toggle-slider::before {
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    top: 2px;
+  }
+
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(18px);
+  }
+
+  /* Make logo smaller and give it breathing room so toggle doesn't overlap */
+  .nav-logo {
+    width: 64px;
+    height: 64px;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    z-index: 10;
   }
 }
