@@ -145,6 +145,11 @@ body.dark .toggle {
   margin-bottom: 1.8rem;
 }
 
+/* Ensure logo is centered in the page flow */
+.nav-logo {
+  align-self: center;
+}
+
 /* AUTH LAYOUT */
 .auth {
   width: 880px;
@@ -454,4 +459,10 @@ body.dark .spinner {
     margin-bottom: 1rem;
     z-index: 10;
   }
+
+  /* At very small widths hide the textual 'Dark Mode' label and keep only the moon icon */
+  .toggle-label { display: none; }
+
+  /* Make toggle background compact and circular to emphasize icon-only control */
+  .toggle { padding: 6px; border-radius: 999px; }
 }
